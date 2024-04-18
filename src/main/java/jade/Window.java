@@ -5,6 +5,7 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWErrorCallbackI;
 import org.lwjgl.opengl.GL;
 
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -35,6 +36,14 @@ public class Window {
 
         init();
         loop();
+
+        // Free the memory
+        glfwFreeCallbacks(glfwWindow);
+        glfwDestroyWindow(glfwWindow);
+
+        // Terminate GLFW and the free the error callback
+        glfwTerminate();
+        glfwSetErrorCallback(null).free();
     }
 
     public void init() {
@@ -45,7 +54,6 @@ public class Window {
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
-
         //configure GLFW
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
@@ -60,6 +68,12 @@ public class Window {
 
         //make the OpenGL context current
         glfwMakeContextCurrent(glfwWindow);
+
+        glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
+        glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
+        glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
+        glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
+
         //Enable v-sync
         glfwSwapInterval(1);
 
@@ -80,6 +94,9 @@ public class Window {
             glfwPollEvents();
             glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 
+            if(MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_1)){
+                System.out.println("Right Click pressed");
+            }
             glClear(GL_COLOR_BUFFER_BIT);
             glfwSwapBuffers(glfwWindow);
         }
