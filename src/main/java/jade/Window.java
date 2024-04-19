@@ -73,6 +73,7 @@ public class Window {
         glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
         glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
         glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
+        glfwSetJoystickCallback(JoystickListener::JoystickCallback);
 
         //Enable v-sync
         glfwSwapInterval(1);
