@@ -5,6 +5,8 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWErrorCallbackI;
 import org.lwjgl.opengl.GL;
 
+import java.util.Arrays;
+
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -95,6 +97,12 @@ public class Window {
             glfwPollEvents();
             glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 
+            if(glfwJoystickPresent(GLFW_JOYSTICK_1)){
+                JoystickListener.updateJoystickStates();
+                if(JoystickListener.buttonDown(0)){
+                    System.out.println("button pressed.");
+                }
+            }
             if(MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_1)){
                 System.out.println("Right Click pressed");
             }
