@@ -4,8 +4,8 @@ import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWErrorCallbackI;
 import org.lwjgl.opengl.GL;
+import util.Time;
 
-import java.util.Arrays;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -92,11 +92,14 @@ public class Window {
     }
 
     public void loop(){
+        float beginTime = Time.getTime();
+        float fps;
+        float endTime;
+        float dt = -1.0f;
         while(!glfwWindowShouldClose(glfwWindow)) {
             //poll events
             glfwPollEvents();
             glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-
             if(glfwJoystickPresent(GLFW_JOYSTICK_1)){
                 JoystickListener.updateJoystickStates();
                 if(JoystickListener.buttonDown(0)){
@@ -108,6 +111,13 @@ public class Window {
             }
             glClear(GL_COLOR_BUFFER_BIT);
             glfwSwapBuffers(glfwWindow);
+
+            endTime = Time.getTime();
+            dt = endTime - beginTime;
+            beginTime = endTime;
+            fps = 1.0f / dt; // Calculate FPS
+            System.out.println("FPS: "+ fps);
         }
     }
 }
+
