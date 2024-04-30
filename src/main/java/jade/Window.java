@@ -17,13 +17,17 @@ public class Window {
     private int width, height;
     private String title;
     private long glfwWindow;
-
+    public float r,g,b,a;
     private static Window window = null;
-
+    private static Scene currentScene;
     private Window() {
         this.width = 1920;
         this.height = 1080;
         this.title = "Mario";
+        r = 1;
+        b = 1;
+        g = 1;
+        a = 1;
     }
 
     public static Window get() {
@@ -32,7 +36,19 @@ public class Window {
         }
         return Window.window;
     }
-
+    public static void changeScene(int newScene){
+        switch(newScene){
+            case 0:
+                currentScene = new LevelEditorScene();
+                break;
+            case 1:
+                currentScene = new LevelScene();
+                break;
+            default:
+                assert false: "Unknown Scene '"+newScene+"'";
+                break;
+        }
+    }
     public void run() {
         System.out.println("Hello LWJGL" + Version.getVersion() + "!");
 
@@ -89,6 +105,8 @@ public class Window {
         // creates the GLCapabilities instance and makes the OpenGL
         // bindings available for use.
         GL.createCapabilities();
+
+        Window.changeScene(0);
     }
 
     public void loop(){
@@ -99,7 +117,6 @@ public class Window {
         while(!glfwWindowShouldClose(glfwWindow)) {
             //poll events
             glfwPollEvents();
-            glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
             if(glfwJoystickPresent(GLFW_JOYSTICK_1)){
                 JoystickListener.updateJoystickStates();
                 if(JoystickListener.buttonDown(0)){
@@ -109,6 +126,7 @@ public class Window {
             if(MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_1)){
                 System.out.println("Right Click pressed");
             }
+            glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
             glfwSwapBuffers(glfwWindow);
 
@@ -116,6 +134,9 @@ public class Window {
             dt = endTime - beginTime;
             beginTime = endTime;
             fps = 1.0f / dt; // Calculate FPS
+            if(dt>0){
+                currentScene.update(dt);
+            }
             System.out.println("FPS: "+ fps);
         }
     }
