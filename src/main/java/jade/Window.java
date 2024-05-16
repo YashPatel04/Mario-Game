@@ -40,9 +40,11 @@ public class Window {
         switch(newScene){
             case 0:
                 currentScene = new LevelEditorScene();
+                currentScene.init();
                 break;
             case 1:
                 currentScene = new LevelScene();
+                currentScene.init();
                 break;
             default:
                 assert false: "Unknown Scene '"+newScene+"'";
@@ -117,6 +119,7 @@ public class Window {
         while(!glfwWindowShouldClose(glfwWindow)) {
             //poll events
             glfwPollEvents();
+
             if(glfwJoystickPresent(GLFW_JOYSTICK_1)){
                 JoystickListener.updateJoystickStates();
                 if(JoystickListener.buttonDown(0)){
@@ -126,18 +129,22 @@ public class Window {
             if(MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_1)){
                 System.out.println("Right Click pressed");
             }
+
             glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
+
+            fps = 1.0f / dt; // Calculate FPS
+
+            if(dt>=0){
+                currentScene.update(dt);
+                System.out.println("FPS: "+ fps);
+            }
+
             glfwSwapBuffers(glfwWindow);
 
             endTime = Time.getTime();
             dt = endTime - beginTime;
             beginTime = endTime;
-            fps = 1.0f / dt; // Calculate FPS
-            if(dt>0){
-                currentScene.update(dt);
-            }
-            System.out.println("FPS: "+ fps);
         }
     }
 }
