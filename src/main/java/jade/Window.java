@@ -133,15 +133,13 @@ public class Window {
             glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            fps = 1.0f / dt; // Calculate FPS
-
             if(dt>=0){
-                currentScene.update(dt);
+                fps = 1.0f / dt; // Calculate FPS
                 System.out.println("FPS: "+ fps);
+                currentScene.update(dt);
             }
 
             glfwSwapBuffers(glfwWindow);
-
             endTime = Time.getTime();
             dt = endTime - beginTime;
             beginTime = endTime;
