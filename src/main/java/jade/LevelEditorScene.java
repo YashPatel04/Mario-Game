@@ -2,9 +2,8 @@ package jade;
 
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
-import renderer.Shader;
 import util.Time;
-
+import renderer.*;
 import java.awt.event.KeyEvent;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -15,16 +14,11 @@ import static org.lwjgl.opengl.GL20.*;
 
 public class LevelEditorScene extends Scene{
     private float[] vertexArray = {
-
-            // position               // color
-            10.5f, -10.5f, 10.0f,       1.0f, 0.0f, 0.0f, 1.0f, // Bottom right 0
-            -10.5f,  10.5f, 10.0f,       0.0f, 1.0f, 0.0f, 1.0f, // Top left     1
-            10.5f,  10.5f, 10.0f ,      1.0f, 0.0f, 1.0f, 1.0f, // Top right    2
-            -10.5f, -10.5f, 10.0f,       1.0f, 1.0f, 0.0f, 1.0f, // Bottom left  3
-            100.5f, 10.5f, 10.0f,       1.0f, 0.0f, 0.0f, 1.0f, // Bottom right 0
-            10.5f,  100.5f, 10.0f,       0.0f, 1.0f, 0.0f, 1.0f, // Top left     1
-            100.5f,  100.5f, 10.0f ,      1.0f, 0.0f, 1.0f, 1.0f, // Top right    2
-            10.5f, 10.5f, 10.0f,       1.0f, 1.0f, 0.0f, 1.0f, // Bottom left  3
+            // position               // color                  // UV Coordinates
+            100f,   0f, 0.0f,       1.0f, 0.0f, 0.0f, 1.0f,     1, 1, // Bottom right 0
+            0f, 100f, 0.0f,       0.0f, 1.0f, 0.0f, 1.0f,     0, 0, // Top left     1
+            100f, 100f, 0.0f ,      1.0f, 0.0f, 1.0f, 1.0f,     1, 0, // Top right    2
+            0f,   0f, 0.0f,       1.0f, 1.0f, 0.0f, 1.0f,     0, 1  // Bottom left  3
 
     };
     //IMPORTANT: Must be in Anti-clockwise order when writing triangles in element array.
@@ -41,6 +35,7 @@ public class LevelEditorScene extends Scene{
     private int vertexID, fragmentID, shaderProgram;
     private int vaoID, vboID, eboID;
     private Shader defaultShader;
+    private Texture testTexture;
     public LevelEditorScene(){
 
     }
@@ -49,6 +44,7 @@ public class LevelEditorScene extends Scene{
         this.camera = new Camera(new Vector2f(-200,-300));
         defaultShader = new Shader("assets/shaders/default.glsl");
         defaultShader.compile();
+        this.testTexture = new Texture("assets/images/test.png");
         //=============================================================
         //Generate VAO, VBO and EBO buffer objects, and send to the GPU
         //=============================================================
@@ -75,12 +71,14 @@ public class LevelEditorScene extends Scene{
         //Add the vertex and attribute pointers
         int positionSize = 3;
         int colorSize = 4;
-        int floatSizeInBytes = 4;
-        int vertexSizeBytes = (positionSize+colorSize)*floatSizeInBytes;
+        int uvSize = 2;
+        int vertexSizeBytes = (positionSize+colorSize+uvSize)*Float.BYTES;
         glVertexAttribPointer(0, positionSize, GL_FLOAT, false, vertexSizeBytes,0);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, colorSize, GL_FLOAT,false, vertexSizeBytes, positionSize*floatSizeInBytes);
+        glVertexAttribPointer(1, colorSize, GL_FLOAT,false, vertexSizeBytes, positionSize*Float.BYTES);
         glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, uvSize, GL_FLOAT, false, vertexSizeBytes, (colorSize+positionSize) * Float.BYTES);
+        glEnableVertexAttribArray(2);
     }
 
     @Override
@@ -94,6 +92,12 @@ public class LevelEditorScene extends Scene{
         defaultShader.uploadMat4f("uProjection", camera.getProjectionMatrix());
         defaultShader.uploadMat4f("uView", camera.getViewMatrix());
         defaultShader.uploadFloat("uTime", Time.getTime());
+
+        //upload the texture to the shader
+        defaultShader.uploadTexture("TEX_SAMPLER",0);
+        glActiveTexture(GL_TEXTURE0);
+        testTexture.bind();
+
         //bind the VAO that we're using
         glBindVertexArray(vaoID);
 
