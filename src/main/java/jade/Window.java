@@ -5,8 +5,6 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWErrorCallbackI;
 import org.lwjgl.opengl.GL;
 import util.Time;
-
-
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -41,10 +39,12 @@ public class Window {
             case 0:
                 currentScene = new LevelEditorScene();
                 currentScene.init();
+                currentScene.start();
                 break;
             case 1:
                 currentScene = new LevelScene();
                 currentScene.init();
+                currentScene.start();
                 break;
             default:
                 assert false: "Unknown Scene '"+newScene+"'";
@@ -136,6 +136,8 @@ public class Window {
             if(dt>=0){
                 fps = 1.0f / dt; // Calculate FPS
                 System.out.println("FPS: "+ fps);
+                CharSequence frames = Double.toString(Math.ceil(fps));
+                glfwSetWindowTitle(glfwWindow, frames);
                 currentScene.update(dt);
             }
 
